@@ -53,9 +53,9 @@ class LocalCacheStore
 
   #This method is called to set a value within this cache store by it's key.
   #
-  # @param [String] This is the unique key to reference the value being set within this cache store.
-  # @param [Object] This is the value to set within this cache store.
-  # @param [Integer] This is the number of seconds from the current time that this value should expire.
+  # @param key [String] This is the unique key to reference the value being set within this cache store.
+  # @param value [Object] This is the value to set within this cache store.
+  # @param expires_in [Integer] This is the number of seconds from the current time that this value should expire.
   def set(key, value, expires_in = 0)
     remove(build_key(key))
     expires = nil
@@ -68,9 +68,10 @@ class LocalCacheStore
 
   #This method is called to get a value from this cache store by it's unique key.
   #
-  # @param [String] This is the unique key to reference the value to fetch from within this cache store.
-  # @param [Integer] This is the number of seconds from the current time that this value should expire. (This is used in conjunction with the block to hydrate the cache key if it is empty.)
-  # @param [Block] This block is provided to hydrate this cache store with the value for the request key when it is not found.
+  # @param key [String] This is the unique key to reference the value to fetch from within this cache store.
+  # @param expires_in [Integer] This is the number of seconds from the current time that this value should expire. (This is used in conjunction with the block to hydrate the cache key if it is empty.)
+  # @param &block [Block] This block is provided to hydrate this cache store with the value for the request key when it is not found.
+  # @returns [Object] The value for the specified unique key within the cache store.
   def get(key, expires_in = 0, &block)
 
     #look for the cache item in the store
@@ -103,14 +104,15 @@ class LocalCacheStore
 
   # This method is called to remove a value from this cache store by it's unique key.
   #
-  # @param [String] This is the unique key to reference the value to remove from this cache store.
+  # @param key [String] This is the unique key to reference the value to remove from this cache store.
   def remove(key)
     @store.delete_if { |i| i[:key] == build_key(key) }
   end
 
   # This method is called to check if a value exists within this cache store for a specific key.
   #
-  # @param [String] This is the unique key to reference the value to check for within this cache store.
+  # @param key [String] This is the unique key to reference the value to check for within this cache store.
+  # @returns [Boolean] True or False to specify if the key exists in the cache store.
   def exist?(key)
     !@store.select { |i| i[:key] == build_key(key) }.empty?
   end
