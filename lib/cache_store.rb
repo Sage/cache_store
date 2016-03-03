@@ -1,6 +1,5 @@
 require "cache_store/version"
 require 'date'
-require 'pry'
 #This class is used to define the contract that CacheStore implementations must adhere to.
 class CacheStoreContract
 
