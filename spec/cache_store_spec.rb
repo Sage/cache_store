@@ -22,13 +22,14 @@ describe LocalCacheStore do
       key = 'key123'
       value = 'value123'
       expires_in = 10
-      now = DateTime.now
-      expires = DateTime.new(now.year, now.month, now.day, 0, 0, expires_in)
+
+      now = Time.now.utc
+
       subject.set(key, value, expires_in)
 
       expect(subject.store[0][:key]).to eq(key)
       expect(subject.store[0][:value]).to eq(value)
-      expect(subject.store[0][:expires]).to eq(expires)
+      expect(subject.store[0][:expires]).to be > now
 
     end
 
@@ -59,8 +60,7 @@ describe LocalCacheStore do
       value = 'value123'
       expires_in = 10
 
-      now = DateTime.now
-      expires = DateTime.new(now.year, now.month, now.day, 0, 0, expires_in)
+      now = Time.now.utc
 
       result = subject.get(key, expires_in) do
         value
@@ -68,7 +68,7 @@ describe LocalCacheStore do
 
       expect(result).to eq(value)
       expect(subject.store.length).to eq(1)
-      expect(subject.store[0][:expires]).to eq(expires)
+      expect(subject.store[0][:expires]).to be > now
 
     end
 
@@ -77,7 +77,7 @@ describe LocalCacheStore do
       key = 'key123'
       value = 'value123'
 
-      subject.store.push({ key: key, value: 'old_value', expires: DateTime.now })
+      subject.store.push({ key: key, value: 'old_value', expires: Time.now.utc })
 
       result = subject.get(key) do
         value
@@ -93,7 +93,7 @@ describe LocalCacheStore do
       key = 'key123'
       value  = 'value123'
 
-      subject.store.push({ key: key, value: value, expires: DateTime.now })
+      subject.store.push({ key: key, value: value, expires: Time.now.utc })
 
       expect(subject.get(key)).to eq(nil)
       expect(subject.store.length).to eq(0)

@@ -1,5 +1,6 @@
 require "cache_store/version"
 require 'date'
+require 'time'
 #This class is used to define the contract that CacheStore implementations must adhere to.
 class CacheStoreContract
 
@@ -59,8 +60,9 @@ class LocalCacheStore
     remove(build_key(key))
     expires = nil
     if expires_in > 0
-      now = DateTime.now
-      expires = DateTime.new(now.year, now.month, now.day, 0, 0, expires_in)
+      #now = DateTime.now
+      #expires = DateTime.new(now.year, now.month, now.day, 0, 0, expires_in)
+      expires = Time.now.utc + expires_in
     end
     @store.push({ key: build_key(key), value: value, expires: expires})
   end
@@ -77,7 +79,7 @@ class LocalCacheStore
     items = @store.select { |i| i[:key] == build_key(key) }
     item = if !items.empty? then items[0] else nil end
     #check if a valid item was found in the store
-    if item == nil || (item[:expires] != nil && item[:expires] <= DateTime.now)
+    if item == nil || (item[:expires] != nil && item[:expires] <= Time.now.utc)
       #a valid item wasn't found so check if a hydration block was specified.
       if block_given?
         #create the item from the block
