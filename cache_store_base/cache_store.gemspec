@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'cache_store/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "cache_store_redis"
+  spec.name          = "cache_store"
   spec.version       = CacheStore::VERSION
   spec.authors       = ["vaughanbrittonsage"]
   spec.email         = ["vaughan.britton@sage.com"]
