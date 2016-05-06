@@ -46,7 +46,7 @@ class LocalCacheStore
 
   attr_accessor :store
 
-  def initialize(namespace = '')
+  def initialize(namespace = nil)
     @store = Array.new
     @namespace = namespace
   end
@@ -121,6 +121,12 @@ class LocalCacheStore
   private
 
   def build_key(key)
-    @namespace + key.to_s
+    k = ''
+    if @namespace != nil
+      k = @namespace + ':' + key.to_s
+    elsif
+      k = key.to_s
+    end
+    k
   end
 end

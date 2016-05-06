@@ -143,7 +143,7 @@ describe LocalCacheStore do
 
   describe 'with namespace specified' do
 
-     subject { LocalCacheStore.new('test_') }
+     subject { LocalCacheStore.new('test') }
 
     it 'should set a value and append the namespace to the key' do
 
@@ -151,7 +151,7 @@ describe LocalCacheStore do
 
       subject.set(key, 'value123')
 
-      expect(subject.store[0][:key]).to eq('test_key123')
+      expect(subject.store[0][:key]).to eq('test:key123')
 
     end
 
@@ -160,7 +160,7 @@ describe LocalCacheStore do
       key = 'key123'
       value = 'value123'
 
-      subject.store.push({key: 'test_' + key, value: value })
+      subject.store.push({key: 'test:' + key, value: value })
 
       result = subject.get(key)
 
@@ -173,7 +173,7 @@ describe LocalCacheStore do
       key = 'key123'
       value = 'value123'
 
-      subject.store.push({key: 'test_' + key, value: value })
+      subject.store.push({key: 'test:' + key, value: value })
 
       subject.remove(key)
 
@@ -186,7 +186,7 @@ describe LocalCacheStore do
        key = 'key123'
        value = 'value123'
 
-       subject.store.push({key: 'test_' + key, value: value })
+       subject.store.push({key: 'test:' + key, value: value })
 
        expect(subject.exist?(key)).to eq(true)
 
