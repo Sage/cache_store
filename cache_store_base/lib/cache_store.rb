@@ -57,11 +57,9 @@ class LocalCacheStore
   # @param value [Object] This is the value to set within this cache store.
   # @param expires_in [Integer] This is the number of seconds from the current time that this value should expire.
   def set(key, value, expires_in = 0)
-    remove(build_key(key))
+    remove(key)
     expires = nil
     if expires_in > 0
-      #now = DateTime.now
-      #expires = DateTime.new(now.year, now.month, now.day, 0, 0, expires_in)
       expires = Time.now.utc + expires_in
     end
     @store.push({ key: build_key(key), value: value, expires: expires})
