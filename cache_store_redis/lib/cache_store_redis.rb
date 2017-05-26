@@ -6,17 +6,30 @@ require 'oj'
 #This class is used for interacting with a redis based cache store.
 class RedisCacheStore
 
-  def initialize(namespace = nil)
+  def initialize(namespace = nil, config = nil)
     @namespace = namespace
-    @client = Redis.new
+    if config == nil
+      @client = Redis.new
+    else
+      @client = Redis.new(config)
+    end
   end
 
   #This method is called to configure the connection to the cache store.
-  def configure(host = 'localhost', port = 6379, db = 'default', password = nil)
-    config = { :host => host, :port => port, :db => db }
+  def configure(host = 'localhost', port = 6379, db = 'default', password = nil, driver: nil, url: nil)
+    if url != nil
+      config[:url] = url
+      config[:db] = db
+    else
+      config = { :host => host, :port => port, :db => db }
+    end
     if password != nil
       config[:password] = password
     end
+    if driver != nil
+      config[:driver] = driver
+    end
+
     @client = Redis.new(config)
   end
 
