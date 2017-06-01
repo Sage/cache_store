@@ -94,6 +94,13 @@ class RedisCacheStore
 
   end
 
+  # Ping the cache store.
+  #
+  # @return [String] `PONG`
+  def ping
+    @client.ping
+  end
+
   private
 
   def build_key(key)
