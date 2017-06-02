@@ -67,7 +67,7 @@ describe RedisCacheStore do
         @cache_store.set(key, value, 1)
         sleep(1.2)  # TODO: find a way to remove this by stubbing the Redis expire mechanism
       end
-              
+
       it 'returns nil' do
         expect(@cache_store.get(key)).to be_nil
       end
@@ -140,6 +140,12 @@ describe RedisCacheStore do
       it 'does not raise an exception' do
         expect { @cache_store.remove(key) }.to_not raise_error
       end
+    end
+  end
+
+  describe '#ping' do
+    it 'pings the cache store' do
+      expect(@cache_store.ping).to eq 'PONG'
     end
   end
 end
