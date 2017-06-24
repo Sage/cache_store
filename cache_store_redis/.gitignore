@@ -7,3 +7,9 @@
 /pkg/
 /spec/reports/
 /tmp/
+
+.idea/*
+*/.idea/*
+../.idea/cache_store.iml
+../.idea/workspace.xml
+../.idea/misc.xml

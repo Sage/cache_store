@@ -1,6 +1,6 @@
-require "cache_store_redis/version"
+require 'cache_store_redis/version'
 require 'redis'
-require 'oj'
+require 'securerandom'
 
 #This class is used to implement a redis cache store.
 #This class is used for interacting with a redis based cache store.
@@ -43,7 +43,7 @@ class RedisCacheStore
     k = build_key(key)
 
     if value != nil
-      v = Oj.dump(value)
+      v = Marshal::dump(value)
     end
 
     @client.set(k, v)
@@ -65,7 +65,7 @@ class RedisCacheStore
     k = build_key(key)
 
     value = @client.get(k)
-    value = Oj.load(value) unless value == nil
+    value = Marshal::load(value) unless value == nil
 
     if value.nil? && block_given?
       value = yield

@@ -8,8 +8,7 @@ end
 
 describe RedisCacheStore do
   before do
-    @cache_store = RedisCacheStore.new
-    @cache_store.configure
+    @cache_store = RedisCacheStore.new('test',{ url: 'redis://redis:6379'})
   end
 
   describe "#set" do
@@ -80,19 +79,19 @@ describe RedisCacheStore do
       subject { described_class.new('myname') }
 
       it 'sets the value' do
-        subject.set(key, value)
+        @cache_store.set(key, value)
 
-        expect(subject.get(key)).to eq(value)
+        expect(@cache_store.get(key)).to eq(value)
       end
 
       context 'when key already exists' do
         let(:new_value) { 'Peter' }
-        before { subject.set(key, value) }
+        before { @cache_store.set(key, value) }
 
         it 'updates the item' do
-          subject.set(key, new_value)
+          @cache_store.set(key, new_value)
 
-          expect(subject.get(key)).to eq(new_value)
+          expect(@cache_store.get(key)).to eq(new_value)
         end
       end
     end
