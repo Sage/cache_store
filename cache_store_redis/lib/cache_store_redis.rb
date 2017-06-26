@@ -7,6 +7,11 @@ require 'securerandom'
 class RedisCacheStore
 
   def initialize(namespace = nil, config = nil)
+
+    if RUBY_PLATFORM != 'java'
+      require 'oj'
+    end
+
     @namespace = namespace
     if config == nil
       @client = Redis.new
@@ -43,7 +48,7 @@ class RedisCacheStore
     k = build_key(key)
 
     if value != nil
-      v = Marshal::dump(value)
+      v = serialize(value)
     end
 
     @client.set(k, v)
@@ -65,7 +70,7 @@ class RedisCacheStore
     k = build_key(key)
 
     value = @client.get(k)
-    value = Marshal::load(value) unless value == nil
+    value = deserialize(value) unless value == nil
 
     if value.nil? && block_given?
       value = yield
@@ -102,6 +107,22 @@ class RedisCacheStore
   end
 
   private
+
+  def serialize(object)
+    if RUBY_PLATFORM == 'java'
+      Marshal::dump(object)
+    else
+      Oj.dump(object)
+    end
+  end
+
+  def deserialize(object)
+    if RUBY_PLATFORM == 'java'
+      Marshal::load(object)
+    else
+      Oj.load(object)
+    end
+  end
 
   def build_key(key)
     k = ''
