@@ -4,10 +4,12 @@ source 'https://rubygems.org'
 gemspec
 
 platforms :ruby do
-  gem 'oj', '2.15.0'
+  gem 'oj', '3.2.0'
+  gem 'json'
   gem 'pry'
 end
 
 platforms :jruby do
+  gem 'json'
   gem 'pry-debugger-jruby'
 end

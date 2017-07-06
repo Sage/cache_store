@@ -1,6 +1,7 @@
 require 'cache_store_redis/version'
 require 'redis'
 require 'securerandom'
+require 'cache_store_redis/marshal'
 
 #This class is used to implement a redis cache store.
 #This class is used for interacting with a redis based cache store.
@@ -108,9 +109,17 @@ class RedisCacheStore
 
   private
 
+  def clean_hash(hash)
+    object.default = nil
+
+  end
+
   def serialize(object)
+    if object.is_a?(Hash)
+      object.default = nil
+    end
     if RUBY_PLATFORM == 'java'
-      Marshal::dump(object)
+      Marshal.dump(object)
     else
       Oj.dump(object)
     end
@@ -118,7 +127,7 @@ class RedisCacheStore
 
   def deserialize(object)
     if RUBY_PLATFORM == 'java'
-      Marshal::load(object)
+      Marshal.load(object)
     else
       Oj.load(object)
     end
