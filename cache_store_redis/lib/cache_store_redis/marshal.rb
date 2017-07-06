@@ -3,22 +3,22 @@ require 'bigdecimal'
 module CacheStore
   class Marshal
 
-    def dump(object)
+    def dump(object, json = true)
       hash = {}
       hash['class'] = object.class
       if object.is_a?(Array)
         hash['items'] = []
         object.each do |a|
-          hash['items'] << dump(a)
+          hash['items'] << dump(a, false)
         end
       elsif object.is_a?(Hash)
         hash['items'] = []
         object.each do |key, value|
-          hash['items'] << { 'key' => key, 'value' => dump(value) }
+          hash['items'] << { 'key' => key, 'value' => dump(value, false) }
         end
       elsif object.instance_variables.length > 0 && ![Date, DateTime,Time].include?(object.class)
         object.instance_variables.each do |v|
-          hash['attributes'] << { 'key' => v, 'value' => dump(object.instance_variable_get(v)) }
+          hash['attributes'] << { 'key' => v, 'value' => dump(object.instance_variable_get(v), false) }
         end
       else
         if hash['class'] == Time
@@ -31,28 +31,37 @@ module CacheStore
           hash['value'] = object
         end
       end
-      JSON.dump(hash)
+
+      if json
+        JSON.dump(hash)
+      else
+        hash
+      end
     end
 
     def get_attributes(object)
       object.instance_variables
     end
 
-    def load(object)
-      so = JSON.parse(object)
+    def load(object, json=true)
+      if json
+        so = JSON.parse(object)
+      else
+        so = object
+      end
 
-      if so['class'] == Array
+      if so['class'] == 'Array'
         so['items'].map { |i| load(i) }
-      elsif so['class'] == Hash
+      elsif so['class'] == 'Hash'
         hash = {}
         so['items'].each do |i|
-          hash[i['key']] = load(i['value'])
+          hash[i['key']] = load(i['value'], false)
         end
         hash
       elsif so['attributes'] != nil
         obj = Object.const_get(so['class']).new
         so['attributes'].each do |a|
-          obj.instance_variable_set(a[:key], load(a['value']))
+          obj.instance_variable_set(a[:key], load(a['value'], false))
         end
         obj
       else
@@ -120,6 +129,7 @@ module CacheStore
       elsif type == nil
         nil
       else
+        binding.pry
         raise 'Unable to parse'
       end
     rescue => e
