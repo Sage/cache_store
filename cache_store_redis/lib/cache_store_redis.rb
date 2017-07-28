@@ -1,10 +1,29 @@
 require 'cache_store_redis/version'
 require 'redis'
 require 'securerandom'
+require 'connection_pool'
 
 #This class is used to implement a redis cache store.
 #This class is used for interacting with a redis based cache store.
 class RedisCacheStore
+
+  def self.pool(config)
+    @pool ||= ConnectionPool.new(size: pool_size, timeout: pool_timeout) do
+      if config == nil
+        Redis.new
+      else
+        Redis.new(config)
+      end
+    end
+  end
+
+  def self.pool_size
+    @pool_size ||= ENV['CACHE_STORE_POOL_SIZE'] || 10
+  end
+
+  def self.pool_timeout
+    @pool_size ||= ENV['CACHE_STORE_POOL_TIMEOUT'] || 1
+  end
 
   def initialize(namespace = nil, config = nil)
 
@@ -13,10 +32,12 @@ class RedisCacheStore
     end
 
     @namespace = namespace
-    if config == nil
-      @client = Redis.new
-    else
-      @client = Redis.new(config)
+    @config = config
+  end
+
+  def with_client
+    self.class.pool(@config).with do |client|
+      yield client
     end
   end
 
@@ -34,8 +55,6 @@ class RedisCacheStore
     if driver != nil
       config[:driver] = driver
     end
-
-    @client = Redis.new(config)
   end
 
   #This method is called to set a value within this cache store by it's key.
@@ -51,10 +70,14 @@ class RedisCacheStore
       v = serialize(value)
     end
 
-    @client.set(k, v)
+    with_client do |client|
+      client.multi do
+        client.set(k, v)
 
-    if expires_in > 0
-      @client.expire(k, expires_in)
+        if expires_in > 0
+          client.expire(k, expires_in)
+        end
+      end
     end
 
   end
@@ -69,7 +92,10 @@ class RedisCacheStore
 
     k = build_key(key)
 
-    value = @client.get(k)
+    value = with_client do |client|
+      client.get(k)
+    end
+
     value = deserialize(value) unless value == nil
 
     if value.nil? && block_given?
@@ -84,9 +110,9 @@ class RedisCacheStore
   #
   # @param key [String] This is the unique key to reference the value to remove from this cache store.
   def remove(key)
-
-    @client.del(build_key(key))
-
+    with_client do |client|
+      client.del(build_key(key))
+    end
   end
 
   # This method is called to check if a value exists within this cache store for a specific key.
@@ -94,16 +120,18 @@ class RedisCacheStore
   # @param key [String] This is the unique key to reference the value to check for within this cache store.
   # @return [Boolean] True or False to specify if the key exists in the cache store.
   def exist?(key)
-
-    @client.exists(build_key(key))
-
+    with_client do |client|
+      client.exists(build_key(key))
+    end
   end
 
   # Ping the cache store.
   #
   # @return [String] `PONG`
   def ping
-    @client.ping
+    with_client do |client|
+      client.ping
+    end
   end
 
   private

@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_dependency('redis')
+  spec.add_dependency('connection_pool')
 
   if RUBY_PLATFORM =~ /java/
     spec.platform = 'java'

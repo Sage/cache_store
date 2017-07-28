@@ -25,7 +25,7 @@ Or install it yourself as:
 All cache store implementations adhere to the following contract:
 
     
-	class CacheStoreContract
+	class CacheStore
 		  
 	  def set(key, value, expires_in = 0)
 	
@@ -132,7 +132,7 @@ Example:
 
 ##LocalCacheStore
 
-The local cache store is a ruby in memory cache store that has no dependency on rails or any other frameworks. Multiple instances of the cache store can be created as required to maintain isolated cache stores, which are perfect for development and testing when your production application cache uses reds or memcached etc as a distributed cache.
+The local cache store is a ruby in memory cache store that has no dependency on rails or any other frameworks. Multiple instances of the cache store can be created as required to maintain isolated cache stores, which are perfect for development and testing when your production application cache uses redis or memcached etc as a distributed cache.
 
     #create a new instance of the cache store
     cache_store = LocalCacheStore.new
