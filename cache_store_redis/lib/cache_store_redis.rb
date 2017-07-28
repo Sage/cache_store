@@ -44,16 +44,17 @@ class RedisCacheStore
   #This method is called to configure the connection to the cache store.
   def configure(host = 'localhost', port = 6379, db = 'default', password = nil, driver: nil, url: nil)
     if url != nil
-      config[:url] = url
-      config[:db] = db
+      @config = {}
+      @config[:url] = url
+      @config[:db] = db
     else
-      config = { :host => host, :port => port, :db => db }
+      @config = { :host => host, :port => port, :db => db }
     end
     if password != nil
-      config[:password] = password
+      @config[:password] = password
     end
     if driver != nil
-      config[:driver] = driver
+      @config[:driver] = driver
     end
   end
 
@@ -133,6 +134,7 @@ class RedisCacheStore
       client.ping
     end
   end
+
 
   private
 

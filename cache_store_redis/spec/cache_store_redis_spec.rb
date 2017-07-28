@@ -8,7 +8,9 @@ end
 
 describe RedisCacheStore do
   before do
-    @cache_store = RedisCacheStore.new('test',{ url: 'redis://redis:6379'})
+    # @cache_store = RedisCacheStore.new('test',{ url: 'redis://redis:6379'})
+    @cache_store = RedisCacheStore.new('test')
+    @cache_store.configure(url: 'redis://redis:6379')
   end
 
   describe "#set" do
