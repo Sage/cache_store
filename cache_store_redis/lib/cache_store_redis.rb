@@ -18,11 +18,11 @@ class RedisCacheStore
   end
 
   def self.pool_size
-    @pool_size ||= ENV['CACHE_STORE_POOL_SIZE'] || 10
+    @pool_size ||= Integer(ENV['CACHE_STORE_POOL_SIZE'] || 20)
   end
 
   def self.pool_timeout
-    @pool_size ||= ENV['CACHE_STORE_POOL_TIMEOUT'] || 1
+    @pool_size ||= Integer(ENV['CACHE_STORE_POOL_TIMEOUT'] || 1)
   end
 
   def initialize(namespace = nil, config = nil)
