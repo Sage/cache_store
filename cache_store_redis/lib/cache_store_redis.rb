@@ -36,8 +36,15 @@ class RedisCacheStore
   end
 
   def with_client
-    self.class.pool(@config).with do |client|
-      yield client
+    if self.class.pool_size > 0
+      self.class.pool(@config).with(timeout: self.class.pool_timeout) do |client|
+        raise 'nil redis client returned from pool' if client.nil?
+        yield client
+      end
+    else
+      # allow single client to be used when pool size is zero
+      @client ||= Redis.new(@config)
+      yield @client
     end
   end
 
