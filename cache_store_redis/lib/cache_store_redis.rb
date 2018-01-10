@@ -62,7 +62,7 @@ class RedisCacheStore
       @config = { host: host, port: port, db: db }
     end
 
-    @config[:password] = password unless password .nil?
+    @config[:password] = password unless password.nil?
     @config[:driver] = driver unless driver.nil?
 
     @config[:connect_timeout] = connect_timeout
