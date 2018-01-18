@@ -13,6 +13,10 @@ describe RedisCacheStore do
     @cache_store.configure(url: 'redis://redis:6379')
   end
 
+  after :each do
+    @cache_store.with_client &:flushdb
+  end
+
   describe "#set" do
     it 'should add a string to the cache store and retrieve it' do
 
@@ -96,6 +100,20 @@ describe RedisCacheStore do
           expect(@cache_store.get(key)).to eq(new_value)
         end
       end
+    end
+  end
+
+  describe '#get' do
+
+    let(:value) { 'value' }
+    let(:key) { 'getkey' }
+
+    it 'runs the hyrdation block when the value is not in the cache' do
+      v = @cache_store.get(key) do
+        value
+      end
+
+      expect(@cache_store.get(key)).to eq v
     end
   end
 

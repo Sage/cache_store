@@ -150,7 +150,7 @@ class RedisCacheStore
 
     if value.nil? && block_given?
       value = yield
-      set(k, value, expires_in)
+      set(key, value, expires_in)
     end
 
     value
