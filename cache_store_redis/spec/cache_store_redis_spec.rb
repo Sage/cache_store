@@ -104,7 +104,6 @@ describe RedisCacheStore do
   end
 
   describe '#get' do
-
     let(:value) { 'value' }
     let(:key) { 'getkey' }
 
@@ -114,6 +113,19 @@ describe RedisCacheStore do
       end
 
       expect(@cache_store.get(key)).to eq v
+    end
+
+    context 'when the value in the store is empty string' do
+      let(:value) { '' }
+
+      it 'does not attempt to deserialize' do
+        v = @cache_store.get(key) do
+          value
+        end
+
+        expect(subject).to_not receive(:deserialize)
+        expect(@cache_store.get(key)).to eq v
+      end
     end
   end
 

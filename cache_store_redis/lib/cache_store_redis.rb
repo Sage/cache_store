@@ -146,7 +146,11 @@ class RedisCacheStore
       client.get(k)
     end
 
-    value = deserialize(value) unless value.nil?
+    if !value.nil? && value.delete('\"').strip.empty?
+      value = value.delete('\"')
+    else
+      value = deserialize(value) unless value.nil?
+    end
 
     if value.nil? && block_given?
       value = yield
