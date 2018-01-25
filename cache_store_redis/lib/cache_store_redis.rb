@@ -116,7 +116,7 @@ class RedisCacheStore
   def set(key, value, expires_in = 0)
     k = build_key(key)
 
-    v = if value.nil?
+    v = if value.nil? || (value.is_a?(String) && value.empty?)
           nil
         else
           serialize(value)
@@ -147,7 +147,7 @@ class RedisCacheStore
     end
 
     if !value.nil? && value.delete('\"').strip.empty?
-      value = value.delete('\"')
+      value = nil
     else
       value = deserialize(value) unless value.nil?
     end

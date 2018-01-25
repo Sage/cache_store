@@ -119,12 +119,9 @@ describe RedisCacheStore do
       let(:value) { '' }
 
       it 'does not attempt to deserialize' do
-        v = @cache_store.get(key) do
-          value
-        end
-
+        @cache_store.set(key, value)
         expect(subject).to_not receive(:deserialize)
-        expect(@cache_store.get(key)).to eq v
+        expect(@cache_store.get(key)).to be nil
       end
     end
   end
