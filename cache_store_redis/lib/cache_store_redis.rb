@@ -146,7 +146,7 @@ class RedisCacheStore
       client.get(k)
     end
 
-    if !value.nil? && value.delete('\"').strip.empty?
+    if !value.nil? && value.strip.empty?
       value = nil
     else
       value = deserialize(value) unless value.nil?

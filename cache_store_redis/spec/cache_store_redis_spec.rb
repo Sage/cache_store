@@ -62,6 +62,10 @@ describe RedisCacheStore do
       expect(v.text).to eq('abc123')
       expect(v.numeric).to eq(123)
 
+      v2 = @cache_store.get(key)
+      expect(v2.class).to eq(TestObject)
+      expect(v2.text).to eq('abc123')
+      expect(v2.numeric).to eq(123)
     end
 
     context 'when set value has expired' do
