@@ -1,5 +1,5 @@
 require 'spec_helper'
-require_relative '../lib/cache_store'
+require 'cache_store'
 
 describe LocalCacheStore do
   describe '#set' do
@@ -10,18 +10,14 @@ describe LocalCacheStore do
 
     it "should add an item to the cache store that doesn't expire when no [expires_in] is specified." do
       subject.set(key, value)
-
-      expect(subject.store[0][:key    ]).to eq(key  )
-      expect(subject.store[0][:value  ]).to eq(value)
-      expect(subject.store[0][:expires]).to eq(nil  )
+      expect(subject.get(key)).to eq(value)
     end
 
     it "should add an item to the cache store and set the expiry when specified." do
-      subject.set(key, value, expires_in)
+      subject.set(key, value, 0.001)
 
-      expect(subject.store[0][:key    ]).to eq(key)
-      expect(subject.store[0][:value  ]).to eq(value)
-      expect(subject.store[0][:expires]).to be > now
+      sleep 0.002
+      expect(subject.get(key)).to be_nil
     end
 
     context "when item already exists" do
@@ -46,43 +42,39 @@ describe LocalCacheStore do
     let(:now       ) { Time.now.utc }
 
     it 'should return a value from the cache store for the specified key when a value is found.' do
-      subject.store.push({ key: key, value: value, expires: nil })
+      subject.set key, value
 
       expect(subject.get(key)).to eq(value)
     end
 
-    it 'should return nil from the cache store for the specified key when no value is found and no hydration block is specified.' do
+    it 'should return nil from the cache store for the specified key when no value is found and no block is specified.' do
       expect(subject.get(key)).to eq(nil)
     end
 
-    it 'should hydrate the cache store with a value for the specified key when no value is found and a hydration block is provided.' do
-
+    it 'should populate the cache store with a value for the specified key when no value is found and a block is provided.' do
       result = subject.get(key, expires_in) do
         value
       end
 
       expect(result).to eq(value)
-      expect(subject.store.length).to eq(1)
-      expect(subject.store[0][:expires]).to be > now
     end
 
-    it 'should hydrate the cache store with a value for the specified key when the value has expired and a hydration block is provided.' do
-      subject.store.push({ key: key, value: 'old_value', expires: Time.now.utc })
+    it 'should populate cache store with a value for the specified key when the value has expired and a block is provided.' do
+      subject.set(key, 'old_value', 0.001)
+      sleep 0.002
 
       result = subject.get(key) do
         value
       end
 
       expect(result).to eq(value)
-      expect(subject.store.length).to eq(1)
-
     end
 
-    it 'should return nil from the cache store for the specified key when a value is expired.' do
-      subject.store.push({ key: key, value: value, expires: Time.now.utc })
+    it 'should return nil from the cache store for the specified key when a value is expired' do
+      subject.set(key, value, 0.001)
+      sleep(0.001)
 
       expect(subject.get(key)).to eq(nil)
-      expect(subject.store.length).to eq(0)
     end
   end
 
@@ -90,11 +82,11 @@ describe LocalCacheStore do
     let(:key  ) { 'key123'   }
     let(:value) { 'value123' }
 
-    it "should remove a value by it's specified key" do
-      subject.store.push({ key: key, value: value })
+    it "should remove a value by its specified key" do
+      subject.set key, value
 
       subject.remove(key)
-      expect(subject.store.length).to eq(0)
+      expect(subject.get(key)).to be_nil
     end
   end
 
@@ -103,7 +95,7 @@ describe LocalCacheStore do
     let(:value) { 'value123' }
 
     context 'when a value exists for a specified key' do
-      before { subject.store.push({ key: key, value: value}) }
+      before { subject.set key, value }
 
       it 'should return true' do
         expect(subject.exist?(key)).to eq(true)
@@ -124,38 +116,10 @@ describe LocalCacheStore do
 
     subject { LocalCacheStore.new('test') }
 
-    it 'should set a value and append the namespace to the key' do
-      subject.set(key, value)
-
-      expect(subject.store[0][:key]).to eq('test:key123')
-    end
-
-    context 'when a namespace has been specified' do
-      before { subject.store.push({key: 'test:' + key, value: value }) }
-
-      it 'should get a value' do
-        result = subject.get(key)
-
-        expect(result).to eq(value)
-      end
-
-      it 'should remove a value' do
-        subject.remove(key)
-
-        expect(subject.store.length).to eq(0)
-      end
-
-      it 'should return true when check if a key exists' do
-        expect(subject.exist?(key)).to eq(true)
-      end
-
-      it "updates item with new value" do
-        expect(subject.get(key)).to eq(value)
-
-        subject.set(key, new_value)
-
-        expect(subject.get(key)).to eq(new_value)
-      end
+    it 'accepts the namespace in the initializer' do
+      store = LocalCacheStore.new('test')
+      store.set key, value
+      expect(store.get(key)).to eq(value)
     end
   end
 end
