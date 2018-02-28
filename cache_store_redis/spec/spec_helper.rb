@@ -1,4 +1,6 @@
 require 'pry'
+require_relative 'test_object'
+require_relative '../lib/cache_store_redis'
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

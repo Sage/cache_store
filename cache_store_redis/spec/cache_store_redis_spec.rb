@@ -1,14 +1,5 @@
-require 'spec_helper'
-require_relative '../lib/cache_store_redis'
-
-class TestObject
-  attr_accessor :text
-  attr_accessor :numeric
-end
-
 describe RedisCacheStore do
   before do
-    # @cache_store = RedisCacheStore.new('test',{ url: 'redis://redis:6379'})
     @cache_store = RedisCacheStore.new('test')
     @cache_store.configure(url: 'redis://redis:6379')
   end
