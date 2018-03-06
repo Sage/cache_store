@@ -1,5 +1,5 @@
 # This class is used to define a pool of re-usable redis connections.
-class ConnectionPool
+class RedisConnectionPool
   attr_accessor :config
 
   def initialize(namespace = nil, config = nil)

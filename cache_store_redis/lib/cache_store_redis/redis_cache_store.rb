@@ -1,7 +1,7 @@
 # This class is used to implement a redis cache store.
 class RedisCacheStore
   def initialize(namespace = nil, config = nil)
-    @connection_pool = ConnectionPool.new(config)
+    @connection_pool = RedisConnectionPool.new(config)
 
     unless RUBY_PLATFORM == 'java'
       require 'oj'
