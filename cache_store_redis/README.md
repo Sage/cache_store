@@ -22,6 +22,4 @@ Or install it yourself as:
 
 ## Environment Variables
 
- - **CACHE_STORE_POOL_SIZE** [Integer] [Default=10] This is the max number of cache_store connections to redis to allow in the connection pool.
- - **CACHE_STORE_POOL_TIMEOUT** [Integer] [Default=1] This is the max number of seconds to wait for a connection from the pool before a timeout occurs.
-  
+ - **REDIS_KEEP_ALIVE_TIMEOUT** [Integer] [Default=30] This is the length of time in seconds a connection will be kept alive in the connection pool.

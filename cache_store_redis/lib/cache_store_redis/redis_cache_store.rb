@@ -1,13 +1,14 @@
 # This class is used to implement a redis cache store.
 class RedisCacheStore
   def initialize(namespace = nil, config = nil)
+    @connection_pool = ConnectionPool.new(config)
+
     unless RUBY_PLATFORM == 'java'
       require 'oj'
     end
 
     @namespace = namespace
     @config = config
-    @queue = Queue.new
 
     @connections_created = 0
     @connections_in_use = 0
@@ -15,26 +16,8 @@ class RedisCacheStore
     @enable_stats = false
   end
 
-  def enable_stats=(value)
-    @enable_stats = value
-  end
-
-  def increment_created_stat
-    @mutex.synchronize do
-      @connections_created += 1
-    end
-  end
-
-  def increment_using_stat
-    @mutex.synchronize do
-      @connections_in_use += 1
-    end
-  end
-
-  def decrement_using_stat
-    @mutex.synchronize do
-      @connections_in_use -= 1
-    end
+  def connection_pool
+    @connection_pool
   end
 
   # This method is called to configure the connection to the cache store.
@@ -61,43 +44,17 @@ class RedisCacheStore
     @config[:connect_timeout] = connect_timeout
     @config[:read_timeout] = read_timeout
     @config[:write_timeout] = write_timeout
-  end
-
-  def fetch_client
-    begin
-      @queue.pop(true)
-    rescue
-      increment_created_stat
-      Redis.new(@config)
-    end
+    connection_pool.config = @config
   end
 
   def clean
-    while @queue.length.positive?
-      client = @queue.pop(true)
-      client.close
-    end
+    connection_pool.shutdown
   end
-
-  def log_stats
-    return unless @enable_stats == true
-    S1Logging.logger.debug do
-      "[#{self.class}] - REDIS Connection Stats. Process: #{Process.pid} | " \
-"Created: #{@connections_created} | Pending: #{@queue.length} | In use: #{@connections_in_use}"
-    end
-  end
+  alias_method :shutdown, :clean
 
   def with_client
-    log_stats
-    begin
-      client = fetch_client
-      increment_using_stat
-      log_stats
-      yield client
-    ensure
-      @queue.push(client)
-      decrement_using_stat
-      log_stats
+    connection_pool.with_connection do |connection|
+      yield connection
     end
   end
 
@@ -106,7 +63,7 @@ class RedisCacheStore
   # @param key [String] This is the unique key to reference the value being set within this cache store.
   # @param value [Object] This is the value to set within this cache store.
   # @param expires_in [Integer] This is the number of seconds from the current time that this value should expire.
-  def set(key, value, expires_in = 0)
+  def set(key, value, expires_in = 3_600)
     k = build_key(key)
 
     v = if value.nil? || (value.is_a?(String) && value.strip.empty?)

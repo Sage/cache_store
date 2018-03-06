@@ -10,7 +10,6 @@ describe RedisCacheStore do
 
   describe "#set" do
     it 'should add a string to the cache store and retrieve it' do
-
       key = SecureRandom.uuid
       value = 'value123'
       @cache_store.set(key, value)
@@ -18,11 +17,9 @@ describe RedisCacheStore do
       v = @cache_store.get(key)
 
       expect(v).to eq(value)
-
     end
 
     it 'should add an object to the cache store and retrieve it' do
-
       key = SecureRandom.uuid
       value = TestObject.new
       value.text = 'abc123'
@@ -35,11 +32,9 @@ describe RedisCacheStore do
       expect(v.class).to eq(TestObject)
       expect(v.text).to eq(value.text)
       expect(v.numeric).to eq(value.numeric)
-
     end
 
     it 'should run the hydration block when the requested key does not exist in the cache' do
-
       key = SecureRandom.uuid
 
       v = @cache_store.get(key) do
