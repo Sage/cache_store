@@ -94,4 +94,14 @@ class OptionalRedisCacheStore
     )
     false
   end
+
+  def shutdown
+    redis_store.shutdown
+  rescue => e
+    @logger.error(
+      "[#{self.class}] - An error occurred checking shutting down the connection pool. " \
+"Error: #{e.message} | Backtrace: #{e.backtrace}"
+    )
+    false
+  end
 end
