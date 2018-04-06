@@ -1,2 +1,5 @@
 .bundle
 *.swp
+idea/
+coverage/
+.DS_Store
