@@ -1,5 +1,10 @@
 # CacheStore
 
+[![Build Status](https://travis-ci.org/Sage/cache_store.svg?branch=master)](https://travis-ci.org/Sage/cache_store)
+[![Maintainability](https://api.codeclimate.com/v1/badges/1b7be47117254e31c5f8/maintainability)](https://codeclimate.com/github/Sage/cache_store/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/1b7be47117254e31c5f8/test_coverage)](https://codeclimate.com/github/Sage/cache_store/test_coverage)
+[![Gem Version](https://badge.fury.io/rb/cache_store.svg)](https://badge.fury.io/rb/cache_store)
+
 Welcome to CacheStore!
 
 This is the base for a cache framework that includes a basic in memory cache store, along with a dependency contract for additional provider implementations plugins.
