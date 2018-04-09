@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'cache_store'
 
 describe LocalCacheStore do
   describe '#set' do
