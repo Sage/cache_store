@@ -75,7 +75,7 @@ Example:
 
 
 > The above example will store the **value** `en-GB` under the **key**
-> `country_code` for **expiry** time of 180 seconds (2minutes).
+> `country_code` for **expiry** time of 180 seconds (3 minutes).
 > Any requests to the `cache_store` for the `country_code` key within the next 180 seconds (3 minutes) will return the `en-GB` value.
 > Requests for the key after the expiry time will return **nil** if no hydration block has been specified in the request.
 >  If you don't specify an **expires_in** parameter then the value stored will not expire for the lifespan of the `cache_store`.
