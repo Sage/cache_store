@@ -61,7 +61,7 @@ class LocalCacheStore
   # @param key [String] Unique key to reference the value to fetch from within this cache store.
   # @param &block [Block] This block is provided to populate this cache store with the value for the request key when it is not found.
   # @return [Object] The value for the specified unique key within the cache store.
-  def get(key, expires_in = 0)
+  def get(key, expires_in = 0, &block)
     item = @store[key]
     if item
       if item[:expires] && item[:expires] < Time.now # An expired entry has been found
